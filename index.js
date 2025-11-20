@@ -1,75 +1,88 @@
-let id = 0
+// ====== ESTADO GLOBAL ======
+let lista = JSON.parse(localStorage.getItem("lista-tarefas")) || [];
+let ultimoId = lista.length ? Math.max(...lista.map(t => t.id)) : 0;
 
-const tarefa = (id, novaTarefa) => `<div>
-<p id='${id}'>${novaTarefa}</p>
-<input type="checkbox" onchange="marcarTarefa(${id})"/>
-<button onclick="removerTarefa(${id})">Remover</button>
-</div>`
 
-const marcarTarefa = (id) => {
-    const strike = document.getElementById(`strike${id}`)
-    if(strike){
-        document.getElementById(id).innerHTML = strike.innerHTML
-    } else {
-        const tarefaConcluida = document.getElementById(id).innerHTML
-        document.getElementById(id).innerHTML = `<strike id='strike${id}'>${tarefaConcluida}</strike`
-    }
+// ====== SALVAR NO LOCALSTORAGE ======
+function salvar() {
+    localStorage.setItem("lista-tarefas", JSON.stringify(lista));
 }
 
+
+// ====== CRIAR HTML DE UMA TAREFA ======
+function gerarHTML(tarefa) {
+    return `
+        <div>
+            <p id="tarefa-${tarefa.id}">
+                ${tarefa.concluida ? `<strike>${tarefa.texto}</strike>` : tarefa.texto}
+            </p>
+
+            <input type="checkbox" 
+                ${tarefa.concluida ? 'checked' : ''} 
+                onchange="marcarTarefa(${tarefa.id})"
+            />
+
+            <button onclick="removerTarefa(${tarefa.id})">
+                Remover
+            </button>
+        </div>
+    `;
+}
+
+
+// ====== EXIBIR TODAS AS TAREFAS ======
 function exibirLista() {
-    const tarefas = JSON.parse(localStorage.getItem('lista-tarefas'))
-    if(tarefas){
-        tarefas.forEach(tarefaListada => {
-            id++
-            document.querySelector('#lista-tarefas').innerHTML += tarefa(id, tarefaListada)
-        })
-    }
+    const div = document.getElementById("lista-tarefas");
+    div.innerHTML = "";  // limpa a tela
+
+    lista.forEach(tarefa => {
+        div.innerHTML += gerarHTML(tarefa);
+    });
 }
+exibirLista();
 
-const validarTarefa = (novaTarefa) => {
-    let tarefaExistente = false
-    const listaTarefas = JSON.parse(localStorage.getItem('lista-tarefas'))
 
-    if(listaTarefas){
-        listaTarefas.map(tarefa => {
-            if(tarefa === novaTarefa){
-                tarefaExistente = true
-                alert('Tarefa já existente')
-            }
-        })
-    
-        return tarefaExistente
-    }
-}
+// ====== ADICIONAR UMA NOVA TAREFA ======
+function adicionarTarefa() {
+    const texto = document.getElementById("nome-tarefa").value.trim();
+    if (!texto) return;
 
-function adicionarTarefa(){
-    id++
-    const novaTarefa = document.getElementById('nome-tarefa').value
-    const listaTarefas = localStorage.getItem('lista-tarefas')
-    if(validarTarefa(novaTarefa)){
-        return
+    // evitar duplicadas
+    if (lista.some(t => t.texto.toLowerCase() === texto.toLowerCase())) {
+        alert("Tarefa já existe!");
+        return;
     }
 
-    document.querySelector('#lista-tarefas').innerHTML += tarefa(id, novaTarefa)
+    ultimoId++;
 
-    if(listaTarefas){
-        const novaLista = JSON.parse(listaTarefas)
-        novaLista.push(novaTarefa)
-        localStorage.setItem('lista-tarefas', JSON.stringify(novaLista))
-    } else {
-        localStorage.setItem('lista-tarefas', JSON.stringify([novaTarefa]))
-    }
+    const nova = {
+        id: ultimoId,
+        texto: texto,
+        concluida: false
+    };
+
+    lista.push(nova);
+    salvar();
+    exibirLista();
+    document.getElementById("nome-tarefa").value = "";
 }
 
-const removerTarefa = (id) => {
-    const tarefaDeletada = document.getElementById(id).innerHTML
-    const listaTarefas = JSON.parse(localStorage.getItem('lista-tarefas'))
-    const novaListaTarefa = listaTarefas.filter(tarefa => tarefa !== tarefaDeletada)
-    localStorage.setItem('lista-tarefas', JSON.stringify(novaListaTarefa))
-    document.querySelector('#lista-tarefas').innerHTML = ''
-    exibirLista()
+
+// ====== MARCAR / DESMARCAR ======
+function marcarTarefa(id) {
+    const tarefa = lista.find(t => t.id === id);
+
+    tarefa.concluida = !tarefa.concluida;
+    salvar();
+    exibirLista();
 }
 
-exibirLista()
+
+// ====== REMOVER ======
+function removerTarefa(id) {
+    lista = lista.filter(t => t.id !== id);
+    salvar();
+    exibirLista();
+}
 
 

@@ -1,52 +1,89 @@
-*{
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
 }
+
 
 body {
-    height: 100vh;
-    background: linear-gradient(90deg, rgb(240, 127, 204)0%, rgb(138, 59, 236)100%);
+    background: linear-gradient(90deg, rgb(240, 127, 204) 0%, rgb(138, 59, 236) 100%);
+    font-family: Arial, sans-serif;
     display: flex;
-    align-items: center;
     justify-content: center;
-    
-}
-
-ul{
-    list-style: none;
+    padding: 40px 0;
 }
 
 main {
-    max-width: 580px;
-    width: 90%;
-    margin: 32px auto;
-    display: grid;
-    gap: 24px;
+background: #7f70d4;
+padding: 32px;
+border-radius: 12px;
+width: min(90vw, 600px);
+display: flex;
+flex-direction: column;
+gap: 24px;
+position: sticky;
+top: 20px;
 }
 
-tudo {
-    flex-direction: column;
-    width: min(90vw, 800px);
-    }
 
-    section div {
-        background-color: #7f70d4;
-        padding: 32px;
-        padding-top: 24px;
-        border-radius: 8px;
-    }
-    
-    section h1 {
-        color: rgb(56, 24, 24);
-    }
-    
-        section ul {
-            display:flex ;
-            flex-wrap: wrap;
-            gap: 16px;
-            margin-top: 24px;
-        }
+h1 {
+color: #fff;
+text-align: center;
+}
+
+
+#form-area {
+display: flex;
+gap: 12px;
+justify-content: center;
+}
+
+
+#nome-tarefa {
+padding: 8px;
+width: 70%;
+border-radius: 6px;
+border: none;
+}
+
+
+button {
+padding: 8px 16px;
+border: none;
+background: rgb(240, 127, 204);
+color: #fff;
+font-weight: bold;
+cursor: pointer;
+border-radius: 6px;
+}
+
+
+#lista-tarefas {
+display: flex;
+flex-direction: column;
+gap: 12px;
+}
+
+
+.tarefa {
+display: flex;
+align-items: center;
+justify-content: space-between;
+background: #fff;
+padding: 12px;
+border-radius: 6px;
+}
+
+
+.tarefa p {
+margin-right: 12px;
+}
+
+
+.acoes {
+display: flex;
+gap: 8px;
+}
 
    
     

@@ -1,35 +1,101 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista de tarefas</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lista de Tarefas</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-        <section>
-            <div>
-                <h1>Minha lista de tarefas com a PretaLab</h1>
-                <ul class="list">
-                    <li>
-                        <input type="text" id="nome-tarefa" />
-                    </li>
-    
-                    <li>
-                        <button onclick="adicionarTarefa()">
-                            Criar tarefa
-                            </button>
-                    </li>
-    
-                    <li>
-                        <div id="lista-tarefas"> </div>
-                    </li>
-                </ul>
-            </div>
-        </section>
+<main>
+<h1>Minha Lista de Tarefas</h1>
 
-    <script src="./index.js"></script>
+<div id="form-area">
+<input type="text" id="nome-tarefa" placeholder="Digite uma tarefa" />
+<button onclick="adicionarTarefa()">Criar</button>
+</div>
 
+
+<div id="lista-tarefas"></div>
+</main>
+
+
+<script>
+let id = 0;
+
+
+function carregarLocalStorage() {
+return JSON.parse(localStorage.getItem("lista-tarefas")) || [];
+}
+
+
+function salvarLocalStorage(lista) {
+localStorage.setItem("lista-tarefas", JSON.stringify(lista));
+}
+
+
+function criarHTML(tarefa) {
+return `
+<div class="tarefa" id="tarefa-${tarefa.id}">
+<p>${tarefa.concluida ? `<strike>${tarefa.texto}</strike>` : tarefa.texto}</p>
+<div class="acoes">
+<input type="checkbox" ${tarefa.concluida ? "checked" : ""} onchange="marcarTarefa(${tarefa.id})" />
+<button onclick="removerTarefa(${tarefa.id})">Remover</button>
+</div>
+</div>
+`;
+}
+
+
+function exibirLista() {
+const lista = carregarLocalStorage();
+document.getElementById("lista-tarefas").innerHTML = "";
+
+
+lista.forEach(tarefa => {
+if (tarefa.id > id) id = tarefa.id;
+document.getElementById("lista-tarefas").innerHTML += criarHTML(tarefa);
+});
+}
+
+
+function adicionarTarefa() {
+const texto = document.getElementById("nome-tarefa").value.trim();
+if (!texto) return alert("Digite uma tarefa!");
+
+
+const lista = carregarLocalStorage();
+id++;
+
+
+const nova = { id, texto, concluida: false };
+lista.push(nova);
+salvarLocalStorage(lista);
+
+
+document.getElementById("lista-tarefas").innerHTML += criarHTML(nova);
+document.getElementById("nome-tarefa").value = "";
+}
+
+
+function marcarTarefa(id) {
+const lista = carregarLocalStorage();
+const tarefa = lista.find(t => t.id === id);
+tarefa.concluida = !tarefa.concluida;
+salvarLocalStorage(lista);
+exibirLista();
+}
+
+
+function removerTarefa(id) {
+let lista = carregarLocalStorage();
+lista = lista.filter(t => t.id !== id);
+salvarLocalStorage(lista);
+exibirLista();
+}
+
+
+exibirLista();
+</script>
 </body>
-</html> 
+</html>
