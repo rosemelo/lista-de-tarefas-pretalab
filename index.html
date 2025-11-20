@@ -1,101 +1,92 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Lista de Tarefas</title>
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lista de Tarefas</title>
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-<main>
-<h1>Minha Lista de Tarefas</h1>
+    <main>
+        <h1>Minha Lista de Tarefas</h1>
 
-<div id="form-area">
-<input type="text" id="nome-tarefa" placeholder="Digite uma tarefa" />
-<button onclick="adicionarTarefa()">Criar</button>
-</div>
+        <div id="form-area">
+            <input type="text" id="nome-tarefa" placeholder="Digite uma tarefa" />
+            <button onclick="adicionarTarefa()">Criar</button>
+        </div>
 
+        <!-- Isso aqui estava perdido no meio do código -->
+        <!-- Se não faz parte da interface, recomendo remover -->
+        <p>updating my to-do list</p>
 
-<div id="lista-tarefas"></div>
-</main>
+        <div id="lista-tarefas"></div>
+    </main>
 
+    <script>
+        let id = 0;
 
-<script>
-let id = 0;
+        function carregarLocalStorage() {
+            return JSON.parse(localStorage.getItem("lista-tarefas")) || [];
+        }
 
+        function salvarLocalStorage(lista) {
+            localStorage.setItem("lista-tarefas", JSON.stringify(lista));
+        }
 
-function carregarLocalStorage() {
-return JSON.parse(localStorage.getItem("lista-tarefas")) || [];
-}
+        function criarHTML(tarefa) {
+            return `
+                <div class="tarefa" id="tarefa-${tarefa.id}">
+                    <p>${tarefa.concluida ? `<strike>${tarefa.texto}</strike>` : tarefa.texto}</p>
+                    <div class="acoes">
+                        <input type="checkbox" ${tarefa.concluida ? "checked" : ""} onchange="marcarTarefa(${tarefa.id})" />
+                        <button onclick="removerTarefa(${tarefa.id})">Remover</button>
+                    </div>
+                </div>
+            `;
+        }
 
+        function exibirLista() {
+            const lista = carregarLocalStorage();
+            document.getElementById("lista-tarefas").innerHTML = "";
 
-function salvarLocalStorage(lista) {
-localStorage.setItem("lista-tarefas", JSON.stringify(lista));
-}
+            lista.forEach(tarefa => {
+                if (tarefa.id > id) id = tarefa.id;
+                document.getElementById("lista-tarefas").innerHTML += criarHTML(tarefa);
+            });
+        }
 
+        function adicionarTarefa() {
+            const texto = document.getElementById("nome-tarefa").value.trim();
+            if (!texto) return alert("Digite uma tarefa!");
 
-function criarHTML(tarefa) {
-return `
-<div class="tarefa" id="tarefa-${tarefa.id}">
-<p>${tarefa.concluida ? `<strike>${tarefa.texto}</strike>` : tarefa.texto}</p>
-<div class="acoes">
-<input type="checkbox" ${tarefa.concluida ? "checked" : ""} onchange="marcarTarefa(${tarefa.id})" />
-<button onclick="removerTarefa(${tarefa.id})">Remover</button>
-</div>
-</div>
-`;
-}
+            const lista = carregarLocalStorage();
+            id++;
 
+            const nova = { id, texto, concluida: false };
+            lista.push(nova);
+            salvarLocalStorage(lista);
 
-function exibirLista() {
-const lista = carregarLocalStorage();
-document.getElementById("lista-tarefas").innerHTML = "";
+            document.getElementById("lista-tarefas").innerHTML += criarHTML(nova);
+            document.getElementById("nome-tarefa").value = "";
+        }
 
+        function marcarTarefa(id) {
+            const lista = carregarLocalStorage();
+            const tarefa = lista.find(t => t.id === id);
+            tarefa.concluida = !tarefa.concluida;
+            salvarLocalStorage(lista);
+            exibirLista();
+        }
 
-lista.forEach(tarefa => {
-if (tarefa.id > id) id = tarefa.id;
-document.getElementById("lista-tarefas").innerHTML += criarHTML(tarefa);
-});
-}
+        function removerTarefa(id) {
+            let lista = carregarLocalStorage();
+            lista = lista.filter(t => t.id !== id);
+            salvarLocalStorage(lista);
+            exibirLista();
+        }
 
-
-function adicionarTarefa() {
-const texto = document.getElementById("nome-tarefa").value.trim();
-if (!texto) return alert("Digite uma tarefa!");
-
-
-const lista = carregarLocalStorage();
-id++;
-
-
-const nova = { id, texto, concluida: false };
-lista.push(nova);
-salvarLocalStorage(lista);
-
-
-document.getElementById("lista-tarefas").innerHTML += criarHTML(nova);
-document.getElementById("nome-tarefa").value = "";
-}
-
-
-function marcarTarefa(id) {
-const lista = carregarLocalStorage();
-const tarefa = lista.find(t => t.id === id);
-tarefa.concluida = !tarefa.concluida;
-salvarLocalStorage(lista);
-exibirLista();
-}
-
-
-function removerTarefa(id) {
-let lista = carregarLocalStorage();
-lista = lista.filter(t => t.id !== id);
-salvarLocalStorage(lista);
-exibirLista();
-}
-
-
-exibirLista();
-</script>
+        exibirLista();
+    </script>
 </body>
 </html>
